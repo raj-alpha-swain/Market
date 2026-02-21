@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surya App - Virtual Mobile Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .header-info h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header-info p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .phone-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notch {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 28px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .camera {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            border: 1px solid #444;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .info-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .info-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-section:last-child {
+            border-bottom: none;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-item strong {
+            color: #333;
+            min-width: 80px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .command-box {
+            background: #2d2d2d;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .command-line {
+            margin-bottom: 5px;
+        }
+
+        .command-line::before {
+            content: '$ ';
+            color: #667eea;
+        }
+
+        @media (max-width: 900px) {
+            .phone-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-info">
+        <h1>📱 Surya App - Virtual Mobile Screen</h1>
+        <p>React Native + Spring Boot Mobile Application</p>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="refreshPreview()">🔄 Refresh App</button>
+        <button class="control-btn" onclick="startBackend()">🍃 Start Backend</button>
+        <button class="control-btn" onclick="startFrontend()">⚛️ Start Frontend</button>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Live Preview</span>
+        </div>
+    </div>
+
+    <div class="phone-container">
+        <div class="phone-frame">
+            <div class="notch">
+                <div class="camera"></div>
+            </div>
+            <div class="screen">
+                <iframe id="appFrame" src="about:blank"></iframe>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h2>🚀 Project Information</h2>
+            
+            <div class="info-section">
+                <h3>Frontend</h3>
+                <div class="info-item">
+                    <strong>Framework:</strong>
+                    <span class="badge">React Native</span>
+                </div>
+                <div class="info-item">
+                    <strong>Platform:</strong> Expo
+                </div>
+                <div class="info-item">
+                    <strong>Location:</strong> mobile-app/
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Backend</h3>
+                <div class="info-item">
+                    <strong>Framework:</strong>
+                    <span class="badge">Spring Boot 3.2</span>
+                </div>
+                <div class="info-item">
+                    <strong>Database:</strong> H2 (In-Memory)
+                </div>
+                <div class="info-item">
+                    <strong>Port:</strong> 8080
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Quick Start Commands</h3>
+                <div class="command-box">
+                    <div class="command-line">cd mobile-app</div>
+                    <div class="command-line">npm start</div>
+                    <div style="margin-top: 10px;"></div>
+                    <div class="command-line">cd backend</div>
+                    <div class="command-line">mvnw spring-boot:run</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Features</h3>
+                <div class="info-item">✅ Beautiful UI Design</div>
+                <div class="info-item">✅ REST API Integration</div>
+                <div class="info-item">✅ Cross-Platform Support</div>
+                <div class="info-item">✅ Hot Reload Development</div>
+            </div>
+
+            <div class="info-section">
+                <h3>Development Tips</h3>
+                <div class="info-item" style="display: block;">
+                    <p style="margin-bottom: 8px;">• Press 'w' in Expo to open web version</p>
+                    <p style="margin-bottom: 8px;">• Scan QR code for mobile testing</p>
+                    <p style="margin-bottom: 8px;">• Backend runs on localhost:8080</p>
+                    <p>• API endpoints start with /api</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <p style="font-size: 14px; color: #666; margin-bottom: 5px;">
+                    <strong>Next Steps:</strong>
+                </p>
+                <p style="font-size: 13px; color: #888;">
+                    Tell me what features you'd like to add to your mobile app!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function refreshPreview() {
+            const frame = document.getElementById('appFrame');
+            frame.src = 'http://localhost:19006'; // Expo web default port
+            console.log('Refreshing preview...');
+        }
+
+        function startBackend() {
+            alert('Run this command in terminal:\ncd backend\nmvnw spring-boot:run');
+        }
+
+        function startFrontend() {
+            alert('Run these commands in terminal:\ncd mobile-app\nnpm start\n\nThen press "w" to open web version');
+        }
+
+        // Try to load the app if it's running
+        setTimeout(() => {
+            const frame = document.getElementById('appFrame');
+            // The frame will show "about:blank" until you start the Expo dev server
+            console.log('Virtual mobile screen ready');
+        }, 1000);
+    </script>
+</body>
+</html>
