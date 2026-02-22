@@ -1,0 +1,17 @@
+# ===== INACTIVE / ARCHIVED FOLDERS =====
+# mobile-app is the old version, mobile-app-fresh is the active one
+mobile-app/
+_inactive_mobile-app/
+
+# ===== BACKEND =====
+backend/__pycache__/
+backend/*.pyc
+backend/venv/
+backend/.env
+
+# ===== UPLOADS =====
+uploads/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
